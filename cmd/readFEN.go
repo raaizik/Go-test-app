@@ -7,7 +7,6 @@ package cmd
 import (
 	"fmt"
 	"github.com/notnil/chess"
-
 	"github.com/spf13/cobra"
 )
 
@@ -18,17 +17,22 @@ var readFENCmd = &cobra.Command{
 	Long: `This command receives a FEN string and prints out the unicode symbols of the position. For example:
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			fmt.Println("No FEN string received as argument.")
+			return
+		}
 		fen, err := chess.FEN(args[0])
-		fmt.Println(args[0])
 		if err != nil {
 			// handle error
-			fmt.Printf("Bad arg %v, %v\n", args[0])
+			fmt.Printf("Bad arg %v, got error from %v", args[0], err)
+			return
 		}
 		game := chess.NewGame(fen)
 		// print outcome and game PGN
 		fmt.Println(game.Position().Board().Draw())
 		fmt.Printf("Game position: %s by %s.\n", game.Outcome(), game.Method())
 		fmt.Println(game.String())
+
 	},
 }
 
