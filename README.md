@@ -1,4 +1,5 @@
 # Go-test-app
+This is a Chess CLI app
 ## Prerequisites
 1. Install task `brew install go-task/tap/go-task`
 
@@ -12,4 +13,7 @@
 ```
 ```
 ./bin/Go-test-app getRandGame
+```
+```
+./bin/Go-test-app findOpening adams
 ```
