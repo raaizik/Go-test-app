@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// todo add	OPENING BOOK (uses channnels) and stockefish vs stockfish
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "Go-test-app",

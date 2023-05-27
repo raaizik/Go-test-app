@@ -7,14 +7,19 @@ package cmd
 import (
 	"fmt"
 	"github.com/notnil/chess"
+	"github.com/notnil/chess/image"
 	"github.com/spf13/cobra"
+	"image/color"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 // readFENCmd represents the readFEN command
 var readFENCmd = &cobra.Command{
 	Use:   "readFEN",
-	Short: "FEN to unicode symbols chess board",
-	Long: `This command receives a FEN string and prints out the unicode symbols of the position. For example:
+	Short: "FEN to unicode symbols chess board + image",
+	Long: `This command receives a FEN string and prints out the unicode symbols of the position + a .svg file containing a visual image of the current position on a board. File saved under boards folder under the project's root directory.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
@@ -32,6 +37,28 @@ var readFENCmd = &cobra.Command{
 		fmt.Println(game.Position().Board().Draw())
 		fmt.Printf("Game position: %s by %s.\n", game.Outcome(), game.Method())
 		fmt.Println(game.String())
+
+		// create file
+		pwd, _ := os.Getwd()
+		FenStr := game.FEN()
+		f, err := os.CreateTemp(filepath.Join(pwd, "/boards/"), "game-*.svg")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer f.Close()
+
+		// create board position
+		pos := &chess.Position{}
+		if err := pos.UnmarshalText([]byte(FenStr)); err != nil {
+			log.Fatal(err)
+		}
+
+		// write board SVG to file
+		yellow := color.RGBA{255, 255, 0, 1}
+		mark := image.MarkSquares(yellow, chess.D2, chess.D4)
+		if err := image.SVG(f, pos.Board(), mark); err != nil {
+			log.Fatal(err)
+		}
 
 	},
 }
