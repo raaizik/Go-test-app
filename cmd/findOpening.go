@@ -17,7 +17,7 @@ import (
 var findOpeningCmd = &cobra.Command{
 	Use:   "findOpening",
 	Short: "Returns the opening used in the received PGN",
-	Long:  `Opens a PGN file name, saved to PGNs folder in project's root dir, of a game and returns the opening used according to the ECO.`,
+	Long:  `Opens a PGN file name (w/o .pgn extension), saved to PGNs folder in project's root dir, of a game and returns the opening used according to the ECO.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Println("No PGN file name received as argument.")
@@ -25,6 +25,11 @@ var findOpeningCmd = &cobra.Command{
 		}
 
 		pgnFilename := args[0]
+
+		// remove .pgn file extension if any
+		if strings.Contains(pgnFilename, ".pgn") {
+			pgnFilename = strings.ReplaceAll(pgnFilename, ".pgn", "")
+		}
 		f, err := os.Open("/Users/il015040/workspace/Go-test-app/PGNs/" + pgnFilename + ".pgn")
 		if err != nil {
 			panic(err)
