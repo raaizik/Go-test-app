@@ -10,16 +10,28 @@ import (
 	"github.com/notnil/chess/opening"
 	"github.com/spf13/cobra"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
 // findOpeningCmd represents the findOpening command
 var findOpeningCmd = &cobra.Command{
 	Use:   "findOpening",
 	Short: "Returns the opening used in the received PGN",
-	Long:  `Opens a PGN file or a folder that is database of PGN files, saved to PGNs folder in project's root dir, and returns the opening used according to the ECO.`,
+	Long:  `Opens a path to a PGN files folder (PGN db), saved to PGNs folder in project's root dir, and returns the openings used according to the ECO.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Println("No file name received as argument.")
@@ -34,12 +46,20 @@ var findOpeningCmd = &cobra.Command{
 		}
 		pwd, _ := os.Getwd()
 		dbPath := filepath.Join(pwd, "/PGNs/"+pgnDBFilename)
+		exists, err := exists(dbPath)
+		if !exists {
+			log.Fatal("The db directory doesn't exist under the PGNs path!")
+		} else if err != nil {
+			log.Fatalf("See error: %v\n", err)
+		}
 		//path, err := os.Open(filepath.Join(pwd, "/PGNs/"+pgnDBFilename))
 
 		items, _ := ioutil.ReadDir(dbPath)
 		for _, item := range items {
 			if item.IsDir() {
-				fmt.Println("Bad structure. DB folder must contain only .pgn files")
+				continue
+				//fmt.Println("Bad structure. DB folder must contain only .pgn files")
+				//return
 				//subitems, _ := ioutil.ReadDir(item.Name())
 				//for _, subitem := range subitems {
 				//	if !subitem.IsDir() {
@@ -77,7 +97,9 @@ var findOpeningCmd = &cobra.Command{
 				pgn, err := chess.PGN(reader)
 				if err != nil {
 					// handle error
-					fmt.Printf("Something went wrong, got error from %v", err)
+					log.Fatalf("Something went wrong, got error from %v", err)
+					//fmt.Printf("Something went wrong, got error from %v", err)
+					//return
 				}
 
 				g := chess.NewGame(pgn)
@@ -85,7 +107,7 @@ var findOpeningCmd = &cobra.Command{
 				// print opening name
 				book := opening.NewBookECO()
 				o := book.Find(g.Moves())
-				fmt.Println(item.Name(), " - ", o.Title())
+				fmt.Println(item.Name(), " --> ", o.Title())
 				//}
 				f.Close()
 			}
