@@ -57,7 +57,7 @@ var findOpeningCmd = &cobra.Command{
 		items, _ := ioutil.ReadDir(dbPath)
 		for _, item := range items {
 			if item.IsDir() {
-				continue
+				log.Print("The database folder shouldn't contain folders")
 				//fmt.Println("Bad structure. DB folder must contain only .pgn files")
 				//return
 				//subitems, _ := ioutil.ReadDir(item.Name())
@@ -68,11 +68,8 @@ var findOpeningCmd = &cobra.Command{
 				//	}
 				//}
 			} else {
-				// handle file there
-				//fmt.Println(item.Name())
+				// handle file
 				f, err := os.Open(filepath.Join(dbPath, item.Name()))
-				//fmt.Printf("File Name: %s\n", info.Name())
-				//return nil
 				if err != nil {
 					panic(err)
 				}
@@ -98,8 +95,6 @@ var findOpeningCmd = &cobra.Command{
 				if err != nil {
 					// handle error
 					log.Fatalf("Something went wrong, got error from %v", err)
-					//fmt.Printf("Something went wrong, got error from %v", err)
-					//return
 				}
 
 				g := chess.NewGame(pgn)
@@ -112,53 +107,6 @@ var findOpeningCmd = &cobra.Command{
 				f.Close()
 			}
 		}
-
-		//filepath.Walk(dbPath, func(path string, info os.FileInfo, err error) error {
-		//	if err != nil {
-		//		log.Fatalf(err.Error())
-		//	}
-		//	f, err := os.Open(filepath.Join(dbPath, info.Name()))
-		//	//fmt.Printf("File Name: %s\n", info.Name())
-		//	//return nil
-		//	if err != nil {
-		//		panic(err)
-		//	}
-		//	defer f.Close()
-		//
-		//	scanner := chess.NewScanner(f)
-		//	// todo: this grabs the first PGN from the db file.
-		//	// can be more complex to have used choose which game from the db file to display
-		//	// OR print opening for each one of the PGNs
-		//	game := chess.NewGame()
-		//	games := make([]*chess.Game, 0, 100)
-		//
-		//	for scanner.Scan() {
-		//		game = scanner.Next()
-		//		games = append(games, game)
-		//	}
-		//	// todo: still grabs only the first PGN in the db
-		//	fmt.Println(len(games))
-		//	for _, game := range games {
-		//		reader := strings.NewReader(game.String())
-		//		pgn, err := chess.PGN(reader)
-		//		if err != nil {
-		//			// handle error
-		//			fmt.Printf("Something went wrong, got error from %v", err)
-		//			return err
-		//		}
-		//
-		//		g := chess.NewGame(pgn)
-		//
-		//		// print opening name
-		//		book := opening.NewBookECO()
-		//		o := book.Find(g.Moves())
-		//		fmt.Println(o.Title())
-		//	}
-		//	return nil
-		//})
-
-		//f, err := os.Open("/Users/il015040/workspace/Go-test-app/PGNs/" + pgnDBFilename + "/*.pgn")
-
 	},
 }
 
